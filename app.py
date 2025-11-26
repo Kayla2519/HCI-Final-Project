@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET', os.urandom(32))
 
 CLIENT_ID = os.environ.get('SPOTIPY_CLIENT_ID', '1aaf8e65994a48f78edc3b37c950deea')
 CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET', '0e19bc6af9c542dfa724961b643d854b')
-REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'http://127.0.0.1:5000/callback')
+REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://musu-ypu7.onrender.com/callback')
 SCOPE = "user-read-private user-read-email playlist-read-private playlist-modify-public playlist-modify-private"
 
 cache_handler = FlaskSessionCacheHandler(session)
@@ -28,6 +28,17 @@ sp_oauth = SpotifyOAuth(
     cache_handler=cache_handler,
     show_dialog=True
 )
+
+def get_spotify_client():
+    token_info = cache_handler.get_cached_token()
+    if not token_info:
+        return None
+    
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        session['token_info'] = token_info
+
+    return Spotify(auth=token_info['access_token'])
 
 def ensure_authorized():
     token_info = cache_handler.get_cached_token()
@@ -122,22 +133,18 @@ def song_result():
         return maybe
     return render_template('song_result.html')
 
-def get_spotify_client():
-    return Spotify(auth_manager=sp_oauth)
-
 @app.route('/api/get_song', methods=['GET'])
 def api_get_song():
-    token_info = cache_handler.get_cached_token()
-    if not token_info:
-        return jsonify({"error": "not_authenticated", "message": "Not authenticated with Spotify."}), 401
+    sp = get_spotify_client()
+    if not sp:
+        return jsonify({"error": "not_authenticated", "message": "Please login first."}), 401
 
     selected_genres = session.get('genres', [])
     if not selected_genres:
         return jsonify({"error": "no_genres_selected", "message": "No genres selected! Please select one or more genres."}), 400
 
     genre = random.choice(selected_genres)
-    sp = get_spotify_client()
-
+    
     try:
         results = sp.search(q=genre, type="artist", limit=15)
     except Exception as e:
