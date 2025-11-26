@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Song Suggestion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .center-box {
+            max-width: 520px;
+            margin: 80px auto;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .cover-img {
+            width: 260px;
+            height: 260px;
+            border-radius: 14px;
+            object-fit: cover;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .pill-btn {
+            padding: 12px 26px;
+            background: var(--accent);
+            color: white;
+            border-radius: 999px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: 0.2s;
+        }
+        .pill-btn:hover {
+            transform: scale(1.05);
+            background: #6d28d9;
+        }
+
+        .link-btn {
+            display: inline-block;
+            margin: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .link-btn:hover {
+            color: white;
+        }
+
+        /* Loading Spinner */
+        #spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            animation: spin 0.9s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% {transform: rotate(0deg);}
+            100% {transform: rotate(360deg);}
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="center-box">
+
+        <h1>Your Song Suggestion</h1>
+
+        <!-- Loading spinner -->
+        <div id="spinner"></div>
+
+        <!-- Status Message -->
+        <p id="message" style="margin-bottom: 20px;">Loading...</p>
+
+        <!-- Song Display Container -->
+        <div id="result" style="display:none;">
+            <img id="albumCover" class="cover-img" src="" alt="Album Cover">
+            <div id="waveform" class="waveform">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <h2 id="trackName"></h2>
+            <p id="artistName" class="artist"></p>
+
+            <!-- Audio Preview -->
+            <audio id="previewPlayer" controls autoplay style="width: 100%; margin-top: 20px;"></audio>
+        </div>
+
+        <!-- Buttons -->
+        <button id="chooseAnother" class="pill-btn">Choose Another</button>
+        <br>
+        <a href="/select_genres" class="link-btn">Back</a>
+        <a href="/select_moods" class="link-btn">Start Over</a>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='song.js') }}"></script>
+
+</body>
+</html>

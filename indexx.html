@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MuSu — Mood Music Selector</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#7c3aed}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#071023 0%,#081227 100%);color:#e6eef8}
+    .container{max-width:980px;margin:36px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:1.4rem;letter-spacing:0.5px}
+    .card{background:rgba(255,255,255,0.03);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);margin-top:18px}
+    .mood-btn{background:var(--accent);border:0;border-radius:10px;padding:10px 16px;margin:6px;color:white;cursor:pointer;font-weight:600}
+    .genre-btn{background:transparent;border:1px solid var(--accent);border-radius:8px;padding:8px 12px;margin:4px;color:var(--muted);cursor:pointer}
+    .genre-btn.selected{background:var(--accent);color:white}
+    .song{display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;transition:opacity 0.5s ease-in-out}
+    img.cover{width:60px;height:60px;border-radius:6px;object-fit:cover}
+    .artist{color:var(--muted);font-size:0.9rem}
+    footer{margin-top:20px;color:var(--muted);font-size:0.85rem;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 MuSu — Find Music by Mood</h1>
+    </header>
+
+    <div class="card" id="moodCard">
+      <h2>Select your mood:</h2>
+      <div id="moodButtons"></div>
+    </div>
+
+    <div class="card" id="genreCard" style="display:none">
+      <h2>Choose genres for <span id="selectedMood"></span> mood:</h2>
+      <div id="genreButtons"></div>
+      <button id="showSongsBtn" class="mood-btn">Show Songs</button>
+    </div>
+
+    <div class="card" id="songsCard" style="display:none">
+      <h2>Matching Song</h2>
+      <div id="songsList"></div>
+      <button id="chooseAnotherBtn" class="mood-btn">Choose Another</button>
+    </div>
+
+    <footer>MuSu — HCI Frontend Prototype • Mood-based genre selection and demo songs</footer>
+  </div>
+
+  <script>
+    const moods = {
+      'Happy': ['Pop', 'Dance'],
+      'Sad': ['Acoustic', 'Indies', 'Blues'],
+      'Chill': ['Lo-Fi', 'Ambient', 'Jazz'],
+      'Energetic': ['Rock', 'Hip-Hop', 'EDM'],
+      'Angry': ['Metal', 'Hard-Rock', 'Punk']
+    };
+
+    const genreCovers = {
+      'Pop': 'https://i.imgur.com/VfR2dgj.jpg',
+      'Dance': 'https://i.imgur.com/L4f6bZP.jpg',
+      'Acoustic': 'https://i.imgur.com/tayPqDn.jpg',
+      'Indies': 'https://i.imgur.com/6vFv7hW.jpg',
+      'Blues': 'https://i.imgur.com/G0aYvAE.jpg',
+      'Lo-Fi': 'https://i.imgur.com/n3gA6T8.jpg',
+      'Ambient': 'https://i.imgur.com/9Rrx9hJ.jpg',
+      'Jazz': 'https://i.imgur.com/hxO4gMw.jpg',
+      'Rock': 'https://i.imgur.com/s3DWtHt.jpg',
+      'Hip-Hop': 'https://i.imgur.com/7cgHY6E.jpg',
+      'EDM': 'https://i.imgur.com/qSTo4dr.jpg',
+      'Metal': 'https://i.imgur.com/k8Uu1pU.jpg',
+      'Hard-Rock': 'https://i.imgur.com/EZtmtYW.jpg',
+      'Punk': 'https://i.imgur.com/HLai2mP.jpg'
+    };
+
+    const moodButtons = document.getElementById('moodButtons');
+    const genreButtons = document.getElementById('genreButtons');
+    const selectedMoodSpan = document.getElementById('selectedMood');
+    const moodCard = document.getElementById('moodCard');
+    const genreCard = document.getElementById('genreCard');
+    const songsCard = document.getElementById('songsCard');
+    const songsList = document.getElementById('songsList');
+    const chooseAnotherBtn = document.getElementById('chooseAnotherBtn');
+
+    let selectedMood = null;
+    let selectedGenres = [];
+    let currentAudio = null;
+
+    for(const mood in moods){
+      const btn = document.createElement('button');
+      btn.textContent = mood;
+      btn.className = 'mood-btn';
+      btn.onclick = ()=> selectMood(mood);
+      moodButtons.appendChild(btn);
+    }
+
+    function selectMood(mood){
+      selectedMood = mood;
+      selectedMoodSpan.textContent = mood;
+      genreButtons.innerHTML='';
+      selectedGenres = [];
+      moods[mood].forEach(g=>{
+        const gb=document.createElement('button');
+        gb.textContent=g;
+        gb.className='genre-btn';
+        gb.onclick=()=> toggleGenre(gb,g);
+        genreButtons.appendChild(gb);
+      });
+      moodCard.style.display='none';
+      genreCard.style.display='block';
+    }
+
+    function toggleGenre(btn,genre){
+      if(selectedGenres.includes(genre)){
+        selectedGenres = selectedGenres.filter(g=>g!==genre);
+        btn.classList.remove('selected');
+      } else {
+        selectedGenres.push(genre);
+        btn.classList.add('selected');
+      }
+    }
+
+    document.getElementById('showSongsBtn').onclick = ()=>{
+      if(selectedGenres.length===0){
+        alert('No genres selected! Please go back and select one or more genres.');
+        return;
+      }
+      showRandomSong(selectedGenres);
+    };
+
+    chooseAnotherBtn.onclick = ()=>{
+      if(currentAudio){currentAudio.pause();currentAudio=null;}
+      showRandomSong(selectedGenres);
+    };
+
+    function showRandomSong(genres){
+      songsList.style.opacity=0;
+      const demoSongs = [
+        {title:'Walking on Sunshine',artist:'Katrina and the Waves',genre:'Pop',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
+        {title:'Happy',artist:'Pharrell Williams',genre:'Pop',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'},
+        {title:'Uptown Funk',artist:'Mark Ronson ft. Bruno Mars',genre:'Pop',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'},
+        {title:'Dancing Queen',artist:'ABBA',genre:'Dance',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'},
+        {title:'We Are Family',artist:'Sister Sledge',genre:'Dance',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'},
+        {title:'Stayin\' Alive',artist:'The Bee Gees',genre:'Dance',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'},
+        {title:'Someone like you',artist:'Adele',genre:'Acoustic',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},
+        {title:'Hallelujah',artist:'Jeff Buckley',genre:'Acoustic',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'},
+        {title:'Everybody Hurts',artist:'R.E.M',genre:'Acoustic',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3'},
+        {title:'Good Woman',artist:'Cat Power',genre:'Indies',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3'},
+        {title:'I miss you, I\'m sorry',artist:'Gracie Abrams',genre:'Indies',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3'},
+        {title:'Romantic Homicide',artist:'d4vd',genre:'Indies',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3'},
+        {title:'The Thrill is Gone',artist:'BB King',genre:'Blues',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3'},
+        {title:'Howlin\' Wolf',artist:'Evil',genre:'Blues',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3'},
+        {title:'Wang Dang Doodle',artist:'Koko Taylor',genre:'Blues',preview:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3'}
+      ];
+      const filtered = demoSongs.filter(s=>genres.includes(s.genre));
+      if(filtered.length===0){
+        songsList.innerHTML='<p>No songs match your selection.</p>';
+      } else {
+        const song = filtered[Math.floor(Math.random()*filtered.length)];
+        const cover = genreCovers[song.genre] || 'https://i.imgur.com/1R7ZC1b.jpg';
+        songsList.innerHTML=`<div class='song'><img class='cover' src='${cover}' alt='cover'><div><strong>${song.title}</strong><div class='artist'>${song.artist}</div><div>${song.genre}</div></div></div>`;
+        if(currentAudio){currentAudio.pause();}
+        currentAudio = new Audio(song.preview);
+        currentAudio.volume = 0;
+        currentAudio.play();
+        let vol = 0;
+        const fade = setInterval(()=>{
+          if(vol < 1){
+            vol += 0.1;
+            currentAudio.volume = vol;
+          } else {
+            clearInterval(fade);
+          }
+        },100);
+      }
+      songsCard.style.display='block';
+      genreCard.style.display='none';
+      setTimeout(()=>songsList.style.opacity=1,100);
+    }
+  </script>
+</body>
+</html>

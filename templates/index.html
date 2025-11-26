@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MuSu — Welcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1:#000000; --bg-2:#0b0b0b; --card:#111111; --muted:#cfc7b0; --accent:#EAB308; --glass:rgba(255,255,255,0.04)
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#fff;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));display:flex;align-items:center;justify-content:center}
+    .wrap{width:min(920px,94%);display:grid;grid-template-columns:1fr;gap:20px;align-items:center}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:36px;box-shadow:0 10px 30px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#3b2f00,#87640b);display:flex;align-items:center;justify-content:center;font-weight:700;color:#000}
+    h1{margin:0;font-size:1.6rem}
+    p.lead{margin:8px 0 0;color:var(--muted);font-size:0.95rem}
+    .actions{margin-top:22px;display:flex;gap:12px;align-items:center}
+    .btn{background:var(--accent);color:#000;border:none;padding:12px 20px;border-radius:999px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(234,179,8,0.14);text-decoration:none}
+    .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:10px 16px}
+    .btn:hover{transform:translateY(-3px);transition:all 220ms cubic-bezier(.2,.9,.3,1)}
+    .meta{margin-top:16px;color:var(--muted);font-size:0.9rem}
+    footer{margin-top:16px;color:rgba(255,255,255,0.35);font-size:0.85rem;text-align:center}
+    @media (max-width:720px){.card{padding:20px}.logo{width:48px;height:48px}.btn{padding:10px 14px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <div class="logo">Mu</div>
+        <div>
+          <h1>MuSu</h1>
+          <p class="lead">Find music by mood — simple, fast, delightful.</p>
+        </div>
+      </div>
+
+      <div class="meta">Pick a mood and we'll suggest a track based on Spotify's catalog.</div>
+
+      <div class="actions">
+        <a href="/select_moods" class="btn">Start</a>
+        <a href="/logout" class="btn alt">Logout</a>
+      </div>
+
+      <footer>• MuSu — HCI Prototype •</footer>
+    </div>
+  </div>
+</body>
+</html>
