@@ -29,3 +29,23 @@ Enjoy the randomly selected song!
 
 Authors:
 Kayla Mombourquette & Joyce Adeyi
+
+
+
+
+For testing our project:
+
+Our web app doesn’t work with just any email address right now, so we created a test account for you to use to access the web app and test its functions.
+
+Steps to access the web app:
+
+1. Go to: https://musu-ypu7.onrender.com
+2. Log in to Spotify using the test account:
+Email: test3583test@gmail.com
+Password: test35833583
+3. If Spotify asks for a verification code sent to the email, go to gmail.com and log in with:
+Email: test3583test@gmail.com
+Password: test3583
+4. Retrieve the code from the email and enter it in the web app where prompted.
+
+After this, you should have full access to test the project.
